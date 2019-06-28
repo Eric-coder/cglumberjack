@@ -110,10 +110,6 @@ class Preflight(QtWidgets.QDialog):
         # construct the GUI
         combo_layout.addWidget(self.software_label)
         combo_layout.addStretch(1)
-        ##combo_layout.addWidget(self.software_selector)
-        #c#ombo_layout.addWidget(self.preflight_label)
-        #c#ombo_layout.addWidget(self.preflight_selector)
-        #combo_layout.addItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
         button_bar = QtWidgets.QHBoxLayout(self)
         button_bar.addItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum))
         button_bar.addWidget(self.run_selected)

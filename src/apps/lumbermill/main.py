@@ -6,10 +6,14 @@ from cglui.widgets.base import LJMainWindow
 from cglui.widgets.dialog import LoginDialog
 from cglcore.path import PathObject, start, icon_path, font_path, load_style_sheet, image_path, split_sequence_frange
 from apps.lumbermill.elements.panels import ProjectPanel, ProductionPanel, ScopePanel, CompanyPanel, VButtonPanel
-
+from apps.lumbermill.elements.IOPanel import IOPanel
 from apps.lumbermill.elements.FilesPanel import FilesPanel
 
-ICON_WIDTH = 24
+RETINA = True
+ICON_WIDTH = 48
+# normal
+if not RETINA:
+ ICON_WIDTH = 24
 
 
 class PathWidget(QtWidgets.QFrame):
@@ -71,11 +75,19 @@ class NavigationWidget(QtWidgets.QFrame):
         self.projects_button.setStyleSheet("background: transparent;")
         self.companies_button.setStyleSheet("background: transparent;")
         self.production_button.setStyleSheet("background: transparent;")
-        back_icon = os.path.join(icon_path(), 'back24px.png')
-        home_icon = os.path.join(icon_path(), 'project24px.png')
-        company_icon = os.path.join(icon_path(), 'company24px.png')
-        self.shots_icon = os.path.join(icon_path(), 'shots24px.png')
-        self.assets_icon = os.path.join(icon_path(), 'flower_40px.png')
+        # if regular
+        #back_icon = os.path.join(icon_path(), 'back24px.png')
+        #home_icon = os.path.join(icon_path(), 'project24px.png')
+        #company_icon = os.path.join(icon_path(), 'company24px.png')
+        #self.shots_icon = os.path.join(icon_path(), 'shots24px.png')
+        #self.assets_icon = os.path.join(icon_path(), 'flower_40px.png')
+        # if retina
+        back_icon = os.path.join(icon_path(), 'back48px.png')
+        home_icon = os.path.join(icon_path(), 'project48px.png')
+        company_icon = os.path.join(icon_path(), 'company48px.png')
+        self.shots_icon = os.path.join(icon_path(), 'shots48px.png')
+        self.assets_icon = os.path.join(icon_path(), 'flower_80px.png')
+
         self.back_button.setIcon(QtGui.QIcon(back_icon))
         self.back_button.setIconSize(QtCore.QSize(ICON_WIDTH, ICON_WIDTH))
         self.companies_button.setIcon(QtGui.QIcon(company_icon))
@@ -264,8 +276,12 @@ class CGLumberjackWidget(QtWidgets.QWidget):
         self.panel = None
         self.radio_filter = radio_filter
         self.source_selection = []
-        self.setMinimumWidth(700)
-        self.setMinimumHeight(600)
+        if RETINA:
+            self.setMinimumWidth(1400)
+            self.setMinimumHeight(1200)
+        else:
+            self.setMinimumWidth(700)
+            self.setMinimumHeight(600)
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.setContentsMargins(0, 0, 0, 0)
@@ -342,7 +358,6 @@ class CGLumberjackWidget(QtWidgets.QWidget):
         if path_object.scope == 'IO':
             if path_object.version:
                 if not self.panel:
-                    from apps.lumbermill.elements.IOPanel import IOPanel
                     self.panel = IOPanel(parent=self, path_object=path_object)
                     self.setMinimumWidth(1100)
                     self.setMinimumHeight(700)
@@ -375,7 +390,7 @@ class CGLumberjackWidget(QtWidgets.QWidget):
             if path_object.scope == '*':
                 self.panel = ScopePanel(path_object=path_object)
             elif path_object.scope == 'IO':
-                from apps.lumbermill.elements.IOPanel import IOPanel
+                # This takes a long time.
                 self.panel = IOPanel(path_object=path_object)
             else:
                 self.panel = ProductionPanel(path_object=path_object, search_box=self.nav_widget.search_box)
@@ -389,7 +404,6 @@ class CGLumberjackWidget(QtWidgets.QWidget):
             if path_object.shot == '*' or path_object.asset == '*' or path_object.seq == '*' or path_object.type == '*':
                 self.panel = ProductionPanel(path_object=path_object, search_box=self.nav_widget.search_box)
         elif last == 'ingest_source':
-            from apps.lumbermill.elements.IOPanel import IOPanel
             self.panel = IOPanel(path_object=path_object)
         elif last == 'task':
             if path_object.task == '*':
@@ -479,11 +493,15 @@ class CGLumberjack(LJMainWindow):
         # Load Style Sheet and set up Styles:
         w = 400
         h = 500
+        # Retina
+        if RETINA:
+            w = 800
+            h = 1000
 
         self.resize(w, h)
         menu_bar = self.menuBar()
         two_bar = self.menuBar()
-        icon = QtGui.QPixmap(":/images/lumberjack.24px.png").scaled(24, 24)
+        icon = QtGui.QPixmap(":/images/lumberjack.24px.png").scaled(ICON_WIDTH, ICON_WIDTH)
         self.setWindowIcon(icon)
         login = QtWidgets.QAction('Login', self)
         tools_menu = menu_bar.addMenu('&Tools')
@@ -549,15 +567,15 @@ class CGLumberjack(LJMainWindow):
     def on_preflight_designer_clicked(self):
         from apps.pipeline.preflight_designer import PreflightDesigner
         dialog = PreflightDesigner(self)
-        dialog.setMinimumWidth(1200)
-        dialog.setMinimumHeight(500)
+        dialog.setMinimumWidth(2400)
+        dialog.setMinimumHeight(1000)
         dialog.exec_()
 
     def on_menu_designer_clicked(self):
         from apps.pipeline.menu_designer import MenuDesigner
         dialog = MenuDesigner(self)
-        dialog.setMinimumWidth(1200)
-        dialog.setMinimumHeight(500)
+        dialog.setMinimumWidth(2400)
+        dialog.setMinimumHeight(1000)
         dialog.exec_()
 
     def closeEvent(self, event):
@@ -596,7 +614,10 @@ if __name__ == "__main__":
         td.show()
         td.raise_()
         # setup stylesheet
-        style_sheet = load_style_sheet()
+        if RETINA:
+            style_sheet = load_style_sheet(style_file='stylesheet_retina.css')
+        else:
+            style_sheet = load_style_sheet()
         app.setStyleSheet(style_sheet)
         splash.finish(td)
         app.exec_()

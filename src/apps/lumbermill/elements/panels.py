@@ -17,7 +17,7 @@ class CompanyPanel(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self, parent)
         self.path_object = path_object
         self.panel = QtWidgets.QVBoxLayout(self)
-        pixmap = QtGui.QPixmap(icon_path('company24px.png'))
+        pixmap = QtGui.QPixmap(icon_path('company48px.png'))
         self.company_widget = LJListWidget('Companies', pixmap=pixmap)
         self.company_widget.add_button.setText('add company')
         self.company_widget.list.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
@@ -47,6 +47,7 @@ class CompanyPanel(QtWidgets.QWidget):
             proj_man = dialog.proj_management_combo.currentText()
             self.path_object.set_attr(company=company)
             self.create_company_globals(company, dialog.proj_management_combo.currentText())
+            print dialog.proj_management_combo.currentText()
             CreateProductionData(self.path_object, project_management=dialog.proj_management_combo.currentText())
             self.load_companies()
 
@@ -108,7 +109,7 @@ class ProjectPanel(QtWidgets.QWidget):
 
         self.user_email = UserConfig().user_email
         self.path_object = path_object
-        self.project_management = app_config(company=self.path_object.company)['account_info']['project_management']
+        self.project_management = app_config()['account_info']['project_management']
         self.root = app_config()['paths']['root']  # Company Specific
         self.user_root = app_config()['cg_lumberjack_dir']
         self.left_column_visibility = True
@@ -116,7 +117,7 @@ class ProjectPanel(QtWidgets.QWidget):
         # Create the Left Panel
         self.panel = QtWidgets.QVBoxLayout(self)
 
-        self.project_filter = ProjectWidget(title="Projects", pixmap=QtGui.QPixmap(icon_path('project24px.png')),
+        self.project_filter = ProjectWidget(title="Projects", pixmap=QtGui.QPixmap(icon_path('project48px.png')),
                                             search_box=search_box)
 
         self.panel.addWidget(self.project_filter)
@@ -221,6 +222,7 @@ class VButtonPanel(QtWidgets.QWidget):
         self.panel.addLayout(self.title_layout)
         self.task_button.clicked.connect(self.add_button_clicked)
         for each in elements:
+            print app_config()['pipeline_steps']['short_to_long']
             task = app_config()['pipeline_steps']['short_to_long'][each]
             button = LJButton(str(task))
             # button.setIcon(QtGui.QIcon(QtGui.QPixmap(os.path.join(icon_path(), image_name))))

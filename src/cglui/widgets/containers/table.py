@@ -32,7 +32,10 @@ class LJTableWidget(QTableView):
         # self.setProperty('class', 'basic')
 
     def row_count(self):
-        return self.model().rowCount()
+        try:
+            return self.model().rowCount()
+        except RuntimeWarning:
+            return False
 
     def mouseReleaseEvent(self, e):
         super(LJTableWidget, self).mouseReleaseEvent(e)

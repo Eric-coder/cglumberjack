@@ -281,6 +281,7 @@ class UserConfig(object):
         if os.path.exists(self.user_config_path):
             self.d = self._load_yaml(self.user_config_path)
         else:
+            print "No File found at: %s", self.user_config_path
             return None
         self.current_path = current_path
         if company:

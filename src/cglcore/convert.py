@@ -152,6 +152,7 @@ def _execute(command):
 
 
 def create_proxy(sequence, ext='jpg', start_frame='1001'):
+    # TODO - need to make this iterate over a folder
     """
     Creates a Jpeg proxy resolution based off the resolution of the given path.
     :param sequence:
@@ -166,9 +167,11 @@ def create_proxy(sequence, ext='jpg', start_frame='1001'):
         CreateProductionData(path_object=output_dir)
     if '####' in sequence:
         # replace ### with "*"
+        print sequence
         hashes, number = hash_to_number(sequence)
         in_seq = '%s*.%s' % (split_sequence(sequence), path_object.ext)
         out_seq = '%s/%s%s.%s' % (output_dir, os.path.basename(split_sequence(sequence)), number, ext)
+        # magick input -scene start_frame
         command = '%s %s -scene %s %s' % (config['magick'], in_seq, start_frame, out_seq)
     else:
         sequence = ''
@@ -200,7 +203,7 @@ def create_hd_proxy(sequence, ext='jpg', width='1920', height='x1080', do_height
         sequence = ''
         fileout = ''
 
-    _execute(command)
+    #_execute(command)
     return out_seq.replace(number, hashes)
 
 
@@ -284,7 +287,6 @@ def create_mov(sequence, framerate=settings['frame_rate'], output_frame_rate=Non
     p = subprocess.Popen(ffmpeg_cmd, shell=True)
     p.wait()
     return output_file
-
 
 
 def make_movie_thumb(input_file, output_file=None, frame='middle', thumb=True):

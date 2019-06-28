@@ -11,11 +11,12 @@ from cglcore.util import split_all
 from cglcore import assetcore
 from cglcore.config import app_config, UserConfig
 
-PROJ_MANAGEMENT = app_config()['account_info']['project_management']
+# PROJ_MANAGEMENT = app_config()['account_info']['project_management']
+PROJ_MANAGEMENT = 'lumbermill'
 EXT_MAP = app_config()['ext_map']
 ROOT = app_config()['paths']['root']
 SEQ_RULES = app_config()['rules']['general']['file_sequence']['regex']
-SEQ_REGEX = re.compile("\\.[0-9]{4,}\\.")
+SEQ_REGEX = re.compile("[0-9]{4,}\\.")
 SPLIT_SEQ_REGEX = re.compile("\\ [0-9]{4,}-[0-9]{4,}$")
 SEQ_SPLIT = re.compile("\\#{4,}")
 SEQ2_SPLIT = re.compile("[%0-9]{2,}d")
@@ -309,6 +310,8 @@ class PathObject(object):
             else:
                 if attr == 'scope':
                     if value:
+                        if value == 'io':
+                            value = 'IO'
                         if value in self.scope_list:
                             self.__dict__[attr] = value
                             self.data[attr] = value
@@ -888,7 +891,7 @@ def seq_from_file(basename):
     if numbers:
         numbers = numbers.group(0).replace('.', '')
         string = '#' * int(len(numbers))
-        string = '.%s.' % string
+        string = '%s.' % string
         this = re.sub(SEQ_REGEX, string, basename)
         return this
     else:
@@ -929,7 +932,7 @@ def load_style_sheet(style_file='stylesheet.css'):
     return data
 
 
-def lj_list_dir(directory, path_filter=None, basename=True):
+def lj_list_dir(directory, path_filter=None, basename=True, hashes=True):
     """
     Returns Files that are ready to be displayed in a LJWidget, essentially we run
     all output
@@ -953,6 +956,7 @@ def lj_list_dir(directory, path_filter=None, basename=True):
         else:
             if basename:
                 seq_string = str(seq_from_file(os.path.basename(each)))
+                print seq_string
                 if seq_string:
                     if seq_string not in output_:
                         output_.append(seq_string)
@@ -965,6 +969,9 @@ def lj_list_dir(directory, path_filter=None, basename=True):
             frange = get_frange_from_seq(os.path.join(directory, each))
             if frange:
                 index = output_.index(each)
+                if not hashes:
+                    hashes, number = hash_to_number(each)
+                    each = '%s%s%s' % (split_sequence(each), number, os.path.splitext(each)[-1])
                 output_[index] = '%s %s' % (each, frange)
         if each in ignore:
             output_.remove(each)
@@ -1041,13 +1048,19 @@ def get_cgl_config():
 
 
 def hash_to_number(sequence):
+    """
+
+    :param sequence:
+    :return: hashes, then number: ####, %04d
+    """
     frange = re.search(SEQ_SPLIT, sequence)
+    print sequence, frange
     count = frange.group(0).count('#')
     if count < 10:
         num = '%0'+str(count)+'d'
     else:
         num = '%'+str(count)+'d'
-    return num
+    return frange.group(0), num
 
 
 def number_to_hash(sequence, full=True):
@@ -1061,8 +1074,11 @@ def number_to_hash(sequence, full=True):
 
 
 def get_start_frame(sequence):
-
-
+    """
+    Gets the start frame of a given sequence
+    :param sequence:
+    :return:
+    """
     dir_, file_ = os.path.split(sequence)
     seq_split = split_sequence(sequence)
     results = lj_list_dir(dir_)
@@ -1083,7 +1099,7 @@ def prep_seq_delimiter(sequence, replace_with='*'):
     :param replace_with: '*': for sequences like .*.dpx, '%': for %04d style sequence definition, '#': for '####' style sequence definition
     :return:
     """
-    path_object = PathObject(sequence)
+    ext = os.path.splitext(sequence)[-1]
     dir_ = os.path.dirname(sequence)
     seq_split = split_sequence(sequence)
     stuff = lj_list_dir(dir_)
@@ -1094,11 +1110,11 @@ def prep_seq_delimiter(sequence, replace_with='*'):
             frange = this.group(0).split('-')[0]
             hash_seq = each.replace(' %s' % frange, '')
     if replace_with == '*':
-        return '%s%s.%s' % (split_sequence(sequence), replace_with, path_object.ext)
+        return '%s%s.%s' % (split_sequence(sequence), replace_with, ext)
     if replace_with == '#':
         return os.path.join(dir_, hash_seq)
     if replace_with == '%':
-        return '%s%s.%s' % (seq_split, hash_to_number(hash_seq), path_object.ext)
+        return '%s%s%s' % (seq_split, hash_to_number(hash_seq)[1], ext)
 
 
 
