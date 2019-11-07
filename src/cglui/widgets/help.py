@@ -22,6 +22,7 @@ class RequestFeatureDialog(LJDialog):
         self.requirements_list = []
         self.results_list = []
         self.links_list = []
+        print 555555
         # This list should be connected to
         self.repo_dict = {'cglumberjack': {'guis': {'Lumbermill': ['src/apps/lumbermill/main.py'],
                                                     'Pipeline Designer': ['src/apps/pipeline/designer.py'],
