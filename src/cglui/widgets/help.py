@@ -8,7 +8,6 @@ from cglui.widgets.base import LJDialog
 from cglcore.util import current_user
 from cglcore import screen_grab
 from cglui.widgets.widgets import AdvComboBox
-from plugins.project_management.asana.basic import AsanaJack
 
 PROJECT_MANAGEMENT = app_config()['account_info']['project_management']
 
@@ -16,6 +15,7 @@ PROJECT_MANAGEMENT = app_config()['account_info']['project_management']
 class RequestFeatureDialog(LJDialog):
     def __init__(self, parent=None, title='Request Feature'):
         LJDialog.__init__(self, parent)
+        from plugins.project_management.asana.basic import AsanaJack
         self.work_group = 'CGLumberjack'
         self.rtf_task_text = ''
         self.requirements_list = []
