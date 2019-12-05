@@ -27,7 +27,8 @@ if __name__ == "__main__":
                 load_lumbermill(app, splash)
             else:
                 from cgl.bin.time_sheet import load_time_sheet
-                load_time_sheet(app, splash)
+                # load_time_sheet(app, splash)
+                load_lumbermill(app, splash)
         else:
             load_lumbermill(app, splash)
     else:

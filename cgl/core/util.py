@@ -5,6 +5,7 @@ import sys
 import getpass
 import datetime
 import time
+import xmltodict
 from os.path import expanduser
 import logging
 import re
@@ -209,6 +210,17 @@ def load_json(filepath):
     with open(filepath) as jsonfile:
         data = json.load(jsonfile)
     return data
+
+
+def save_xml(filepath, data):
+    with open(filepath, 'w') as outfile:
+        outfile.write(xmltodict.unparse(data))
+
+
+def load_xml(filepath):
+    with open(filepath) as xmlfile:
+        docs = xmltodict.parse(xmlfile.read())
+    return docs
 
 
 def cgl_execute(command, return_output=False, print_output=True, methodology='local', verbose=False):
