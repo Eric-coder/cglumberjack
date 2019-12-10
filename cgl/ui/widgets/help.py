@@ -408,10 +408,6 @@ class RequestFeatureDialog(LJDialog):
             if u['name'] not in ['Personal Projects']:
                 users_names.append(u['name'])
             users_list = sorted(users_names)
-            project_list.insert(0, '')
-        self.combo_users_list.clear()
-        self.combo_users_list.addItems(users_list)
-        self.users = self.combo_users_list.currentText()
 
     def choose_deliverable(self):
         if self.message_functions or self.message_files:
@@ -552,12 +548,7 @@ class RequestFeatureDialog(LJDialog):
 
         rtf_task_description = "<strong>Task Description:</strong>\n\t%s\n\n" % self.description_line_edit.text()
         self.requirements_list = [rtf_repo, rtf_language]
-        self.requirements_list.extend(self.list_from_bullets(self.message_software))
-        self.requirements_list.extend(self.list_from_bullets(self.message_files))
-        self.requirements_list.extend(self.list_from_bullets(self.message_functions))
-        self.requirements_list.extend(self.list_from_bullets(self.message_requirements))
         self.results_list = [rtf_deliverable, rtf_delivery_method]
-        self.results_list.extend(self.list_from_bullets(self.message_expected_results))
         rtf_requirements = self.rtf_bullet_list('Requirements:', self.requirements_list)
         rtf_expected_results = self.rtf_bullet_list('Expected Results:', self.results_list)
         links = self.get_relevant_links()
