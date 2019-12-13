@@ -26,9 +26,18 @@ class RoboGary(LJDialog):
         self.gridA.setContentsMargins(96, 0, 0, 12)
         self.grid = QtWidgets.QGridLayout()
         self.grid.setContentsMargins(96, 0, 0, 0)
+
+        # Screenplay stuff
         self.title_label = QtWidgets.QLabel('TITLE:')
         self.title_line_edit.setProperty('class', 'screen_play_edit')
         self.title_line_edit.setText('TYPE TITLE HERE')
+        self.screenplay_text_edit = ScreenPlayTextEdit()
+        self.screenplay_text_edit.setProperty('class', 'screen_play')
+        self.width = 816
+        self.screenplay_text_edit.setMinimumWidth(self.width)
+        self.screenplay_text_edit.setMaximumWidth(self.width)
+
+        # Details stuff
         self.description_label = QtWidgets.QLabel("DESCRIPTION:")
         self.description_line_edit = QtWidgets.QLineEdit('TYPE DESCRIPTION HERE')
         self.description_line_edit.setProperty('class', 'screen_play_edit')
@@ -38,29 +47,36 @@ class RoboGary(LJDialog):
         self.date_label = QtWidgets.QLabel("DATE: ")
         self.date_line_edit = QtWidgets.QLineEdit('TYPE DATE HERE')
         self.date_line_edit.setProperty('class', 'screen_play_edit')
-        self.screenplay_text_edit = ScreenPlayTextEdit()
-        self.screenplay_text_edit.setProperty('class', 'screen_play')
-        self.width = 816
-        self.screenplay_text_edit.setMinimumWidth(self.width)
-        self.screenplay_text_edit.setMaximumWidth(self.width)
+        self.selection_start_label = QtWidgets.QLabel("Start:")
+        self.selection_start_line_edit = QtWidgets.QLineEdit()
+        self.selection_end_label = QtWidgets.QLabel("End:")
+        self.selection_end_line_edit = QtWidgets.QLineEdit()
+
+
 
         # grid
-        self.gridA.addWidget(self.title_label, 0, 0)
-        self.gridA.addWidget(self.title_line_edit, 0, 1)
-        self.grid.addWidget(self.description_label, 1, 0)
-        self.grid.addWidget(self.description_line_edit, 1, 1)
-        self.grid.addWidget(self.location_label, 2, 0)
-        self.grid.addWidget(self.location_line_edit, 2, 1)
-        self.grid.addWidget(self.date_label, 3, 0)
-        self.grid.addWidget(self.date_line_edit, 3, 1)
+        self.gridA.addWidget(self.title_label, 10, 0)
+        self.gridA.addWidget(self.title_line_edit, 10, 1)
+        self.grid.addWidget(self.description_label, 11, 0)
+        self.grid.addWidget(self.description_line_edit, 11, 1)
+        self.grid.addWidget(self.location_label, 12, 0)
+        self.grid.addWidget(self.location_line_edit, 12, 1)
+        self.grid.addWidget(self.date_label, 13, 0)
+        self.grid.addWidget(self.date_line_edit, 13, 1)
+        self.grid.addWidget(self.selection_start_label, 14, 0)
+        self.grid.addWidget(self.selection_start_line_edit, 14, 1)
+        self.grid.addWidget(self.selection_end_label, 15, 0)
+        self.grid.addWidget(self.selection_end_line_edit, 15, 1)
 
         # Toolbar
         toolbar = QtWidgets.QHBoxLayout()
         toolbar.setContentsMargins(96, 0, 0, 0)
-        self.tools_layout.addLayout(self.grid)
+
         self.script_layout.addLayout(self.gridA)
         self.script_layout.addLayout(toolbar)
         self.script_layout.addWidget(self.screenplay_text_edit)
+
+        self.tools_layout.addLayout(self.grid)
 
         self.highlight_button = QtWidgets.QToolButton()
         self.highlight_button.setIcon(QtGui.QIcon(highlight_icon))
@@ -87,7 +103,7 @@ class RoboGary(LJDialog):
         speaker_labels = transcript['results']['speaker_labels']
         previous_speaker = ''
         speakers = []
-        row = 5
+        row = -1
         for segment in speaker_labels['segments']:
             # find out if we're doing the same speaker or a new one:
             segment_list = []
@@ -118,6 +134,8 @@ class RoboGary(LJDialog):
 
                 self.screenplay_text_edit.append('\n\n%s' % speaker)
                 self.screenplay_text_edit.setAlignment(QtCore.Qt.AlignCenter)
+                # TODO is there any way for me to capture the correlation between the cursro position of the word i'm adding
+                # and its index within the json file?
                 self.screenplay_text_edit.append(string_from_segment_list(segment_list))
                 self.screenplay_text_edit.setAlignment(QtCore.Qt.AlignLeft)
             else:
