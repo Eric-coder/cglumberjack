@@ -153,18 +153,26 @@ class CGLMenuButton(QtWidgets.QWidget):
         self.label_line_edit.textChanged.connect(self.on_code_changed)
 
     def on_icon_button_clicked(self):
+        tab_widget = self.parent().parent()
+        widget = tab_widget.currentWidget()
+        index = tab_widget.currentIndex()
+
         default_folder = os.path.join(get_cgl_tools(), self.software, self.menu_type, self.preflight_name)
+        print default_folder, default_folder
         file_paths = QtWidgets.QFileDialog.getOpenFileName(self, 'Choose a File to Attach', default_folder, "*")
         from_path = file_paths[0].replace('\\', '/')
         _, file_ = os.path.split(from_path)
         to_path = os.path.join(default_folder, file_).replace('\\', '/')
         if from_path != to_path:
-            dirname = os.path.dirname(to_path)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+            if not os.path.exists(default_folder):
+                os.makedirs(default_folder)
             cgl_copy(from_path, to_path)
-        self.icon_path_line_edit.setText(to_path)
-        # copy selected icon to icon folder path
+        if os.path.isfile(to_path):
+            self.icon_path_line_edit.setText(to_path)
+            icon = QtGui.QIcon(to_path)
+            tab_widget.setTabIcon(index, icon)
+        else:
+            print 'skipping %s' % to_path
 
     def on_save_clicked(self):
         self.save_clicked.emit()
@@ -385,7 +393,9 @@ class CGLMenu(QtWidgets.QWidget):
     def default_preflight_text(self, preflight_name):
         return 'cgl_tools.%s.%s.%s.%s' % (self.software, self.menu_type, self.menu_name, preflight_name)
 
+
     def load_buttons(self):
+        print 'load buttons', self.menu
         for i in range(len(self.menu)):
             for button in self.menu:
                 if button != 'order':
@@ -397,7 +407,7 @@ class CGLMenu(QtWidgets.QWidget):
                         if 'icon' in self.menu[button].keys():
                             if self.menu[button]['icon']:
                                 icon = QtGui.QIcon(self.menu[button]['icon'])
-                                self.buttons_tab_widget.addTab(button_widget, icon, '')
+                                self.buttons_tab_widget.addTab(button_widget, icon, button)
                             else:
                                 self.buttons_tab_widget.addTab(button_widget, button)
                         else:

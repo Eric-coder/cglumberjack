@@ -303,6 +303,7 @@ class Designer(LJDialog):
 
     def closeEvent(self, event):
         if event:
+            # print 'closing now - not saving, use save_all for that'
             self.save_menus()
 
 
