@@ -328,7 +328,10 @@ class CGLMenu(QtWidgets.QWidget):
         Give the user the chance to choose the shelf, then the button
         :return:
         """
-        menus = self.all_menus.keys()
+        menus = []
+        for m in self.all_menus.keys():
+            if m != self.menu_name:
+                menus.append(m)
         dialog = InputDialog(title="Feature In Progress",
                              message="Choose The Menu First, then The Button You'd like to Import to the current Shelf",
                              combo_box_items=menus, combo_box2_items=[1, 2])
@@ -337,17 +340,17 @@ class CGLMenu(QtWidgets.QWidget):
                                                                                               dialog.combo_box2))
         self.on_import_selection_changed(self.all_menus, dialog.combo_box, dialog.combo_box2)
         dialog.exec_()
-        if dialog.button == 'Ok' or dialog.button == 'Cancel':
+        if dialog.button == 'Ok':
+            print 'Loading Button to this Shelf and saving the json file.'
             dialog.accept()
 
     @staticmethod
     def on_import_selection_changed(dict_, combo_box1, combo_box2):
-        print 'loading stuff'
         shelf = combo_box1.currentText()
-        print shelf
-        print dict_[shelf].keys()
         combo_box2.clear()
-        combo_box2.addItems(dict_[shelf].keys())
+        for each in dict_[shelf].keys():
+            if each != 'order':
+                combo_box2.addItem(each)
 
 
     @staticmethod
