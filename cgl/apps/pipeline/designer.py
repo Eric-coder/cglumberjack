@@ -194,7 +194,8 @@ class Designer(LJDialog):
                 for i in range(len(menu_dict[self.software])+1):
                     for menu in menu_dict[self.software]:
                         if i == menu_dict[self.software][menu]['order']:
-                            buttons = CGLMenu(parent=self, software=self.software, menu_name=menu, menu=menu_dict[self.software][menu],
+                            buttons = CGLMenu(parent=self, software=self.software, menu_name=menu,
+                                              menu=menu_dict[self.software][menu], all_menus=menu_dict[self.software],
                                               menu_path=self.menu_path, menu_type=self.type)
                             buttons.save_clicked.connect(self.on_save_clicked)
                             self.menus.addTab(buttons, menu)

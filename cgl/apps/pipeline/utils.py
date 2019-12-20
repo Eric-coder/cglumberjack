@@ -247,10 +247,12 @@ class CGLMenu(QtWidgets.QWidget):
     """
     save_clicked = QtCore.Signal()
 
-    def __init__(self, parent=None, software=None, menu_type='menus', menu_name='', menu=None, menu_path=''):
+    def __init__(self, parent=None, software=None, menu_type='menus', menu_name='', menu=None, all_menus=None,
+                 menu_path=''):
         QtWidgets.QWidget.__init__(self, parent)
         # initialize variables
         self.menu_type = menu_type
+        self.all_menus = all_menus
         if self.menu_type == 'shelves':
             self.singular = 'shelf'
         elif self.menu_type == 'menus':
@@ -298,7 +300,7 @@ class CGLMenu(QtWidgets.QWidget):
             self.import_menu_button = QtWidgets.QPushButton('import %s button' % self.singular)
         self.add_submenu_button = QtWidgets.QPushButton('add submenu')
         self.add_submenu_button.hide()
-        self.import_menu_button.hide()
+        # self.import_menu_button.hide()
         self.add_button.setProperty('class', 'add_button')
         self.add_submenu_button.setProperty('class', 'add_button')
         self.import_menu_button.setProperty('class', 'add_button')
@@ -321,13 +323,32 @@ class CGLMenu(QtWidgets.QWidget):
         self.import_menu_button.clicked.connect(self.on_import_menu_button_clicked)
         self.load_buttons()
 
-    @staticmethod
-    def on_import_menu_button_clicked():
+    def on_import_menu_button_clicked(self):
+        """
+        Give the user the chance to choose the shelf, then the button
+        :return:
+        """
+        menus = self.all_menus.keys()
         dialog = InputDialog(title="Feature In Progress",
-                             message="This button will allow you to import buttons/preflights from other menus")
+                             message="Choose The Menu First, then The Button You'd like to Import to the current Shelf",
+                             combo_box_items=menus, combo_box2_items=[1, 2])
+        dialog.combo_box.currentIndexChanged.connect(lambda: self.on_import_selection_changed(self.all_menus,
+                                                                                              dialog.combo_box,
+                                                                                              dialog.combo_box2))
+        self.on_import_selection_changed(self.all_menus, dialog.combo_box, dialog.combo_box2)
         dialog.exec_()
         if dialog.button == 'Ok' or dialog.button == 'Cancel':
             dialog.accept()
+
+    @staticmethod
+    def on_import_selection_changed(dict_, combo_box1, combo_box2):
+        print 'loading stuff'
+        shelf = combo_box1.currentText()
+        print shelf
+        print dict_[shelf].keys()
+        combo_box2.clear()
+        combo_box2.addItems(dict_[shelf].keys())
+
 
     @staticmethod
     def on_submenu_button_clicked():
@@ -392,7 +413,6 @@ class CGLMenu(QtWidgets.QWidget):
 
     def default_preflight_text(self, preflight_name):
         return 'cgl_tools.%s.%s.%s.%s' % (self.software, self.menu_type, self.menu_name, preflight_name)
-
 
     def load_buttons(self):
         print 'load buttons', self.menu
