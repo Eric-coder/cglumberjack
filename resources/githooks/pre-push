@@ -25,9 +25,9 @@ branch=`git symbolic-ref --short -q HEAD`
 
 echo "BRANCH NAME: $branch"
 
-pid=$(python ../../cgl/bin/asana_utils.py -g pid)
+pid=$(python C:\\CGLUMBERJACK\\asana_utils.py -g pid)
 echo "PROJECT ID: $pid"
 
-result=$(curl -X GET "https://app.asana.com/api/1.0/projects" -H "Authorization: Bearer 0/60638fd908735ac8ed156242a9d39887")
+result=$(curl -X GET "https://app.asana.com/api/1.0/projects/$pid" -H "Authorization: Bearer 0/60638fd908735ac8ed156242a9d39887")
 
 echo "$result"
