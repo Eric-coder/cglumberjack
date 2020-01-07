@@ -11,6 +11,7 @@ from core.util import load_xml, save_xml, cgl_copy
 workspace = "1145700648005039"
 ROOT = app_config()['paths']['code_root']
 
+
 class SetupGUI(LJDialog):
     def __init__(self, parent=None, title='Setup'):
         LJDialog.__init__(self)

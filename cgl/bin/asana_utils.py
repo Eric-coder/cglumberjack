@@ -3,16 +3,19 @@ import shutil
 import os
 import click
 import sys
-from cgl.core.config import app_config
-from core.util import load_xml, save_xml, cgl_copy
+import xmltodict
 
 
-ROOT = app_config()['paths']['code_root']
+
+def get_workspace_xml():
+    home = os.path.expanduser("~")
+    xml_file = os.path.join(home, "PycharmProjects", "cglumberjack", ".idea", "workspace.xml")
+    return xml_file
 
 
 def get_project_id():
-    xml_file = os.path.join(ROOT, 'resources', 'pycharm_setup', 'workspace.xml')
-    docs = load_xml(xml_file)
+    with open(get_workspace_xml()) as xmlfile:
+        docs = xmltodict.parse(xmlfile.read())
     for item in docs['project']['component']:
         if item['@name'] == "TaskManager":
             for element in item['servers']['Generic']['option']:
@@ -29,4 +32,4 @@ def main(get):
 
 
 if __name__ == "__main__":
-    main("pid")
+    main()
