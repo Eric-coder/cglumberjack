@@ -5,6 +5,10 @@ name=`git symbolic-ref --short -q HEAD`
 if [ $name != "master" ]; then
     task_exist=$(python C:\\CGLUMBERJACK\\asana_utils.py -t "$name")
     echo "Result: $task_exist"
+
+    if [ $task_exist != "exists" ]; then
+        git branch -m $task_exist
+    fi
 fi
 
 in_progress=$(python C:\\CGLUMBERJACK\\asana_utils.py -s "In Progress")
@@ -14,6 +18,6 @@ pid=$(python C:\\CGLUMBERJACK\\asana_utils.py -g pid)
 echo "PROJECT ID: $pid"
 
 if [ "$1" == "$2" ]; then
-	result=$(curl -X POST "https://app.asana.com/api/1.0/sections/$in_progress/addTask" -H "Authorization: Bearer 0/60638fd908735ac8ed156242a9d39887" -d "task=$name")
+	result=$(curl -X POST "https://app.asana.com/api/1.0/sections/$in_progress/addTask" -H "Authorization: " -d "task=$name")
 fi
 echo $result
