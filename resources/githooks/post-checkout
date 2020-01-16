@@ -1,8 +1,13 @@
 #!bin/bash
 
 name=`git symbolic-ref --short -q HEAD`
-in_progress="1146097203178843"
 
+in_progress=$(python C:\\CGLUMBERJACK\\asana_utils.py -s "In Progress")
+echo "$in_progress"
+
+pid=$(python C:\\CGLUMBERJACK\\asana_utils.py -g pid)
+echo "PROJECT ID: $pid"
+s
 if [ "$1" == "$2" ]; then
 	result=$(curl -X POST "https://app.asana.com/api/1.0/sections/$in_progress/addTask" -H "Authorization: Bearer 0/60638fd908735ac8ed156242a9d39887" -d "task=$name")
 fi
