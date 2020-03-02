@@ -12,6 +12,7 @@ google-auth-httplib2
 google-auth-oauthlib
 PyWin32
 xmltodict
+PyExifTool
 
 #  http://aka.ms/vcpython27
 # https://s3.amazonaws.com/aws-cli/AWSCLI64.msi
