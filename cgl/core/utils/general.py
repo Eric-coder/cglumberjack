@@ -150,8 +150,9 @@ def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_fo
         source = glob.glob(source)
         if symlink:
             print('Creating Symbolic Link Sequence')
-            command = 'mklink'
-            temp_dict = {'command': command}
+            command = 'mklink /D "%s" "%s"' % (destination.replace('/', '\\'), dir_.replace('/', '\\'))
+            temp_dict = cgl_execute(command=command, print_output=False, methodology='local', verbose=verbose,
+                                    command_name='%s:copy_sequence' % job_name)
         else:
             command = 'robocopy "%s" "%s" "%s" /NFL /NDL /NJH /NJS /nc /ns /np /MT:8' % (dir_, destination, pattern)
             temp_dict = cgl_execute(command=command, print_output=False, methodology=methodology, verbose=verbose,
@@ -161,19 +162,21 @@ def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_fo
             run_dict['job_id'] = temp_dict['job_id']
     if isinstance(source, list):
         if symlink:
-            print('Creating Symbolic Link list')
-            command = 'mklink'
-            temp_dict = {'command': command}
+            print('Creating symbolic links for file list')
         else:
             temp_dict = copy_file_list(source, destination, methodology, verbose, dest_is_folder, symlink=symlink)
     else:
         if symlink_list:
             if os.path.isdir(source):
                 print('Creating Symbolic Link single directory %s' % source)
+                command = 'mklink /D %s %s' % (destination.replace('/', '\\'), source.replace('/', '\\'))
+                temp_dict = cgl_execute(command=command, print_output=False, methodology='local', verbose=verbose,
+                                        command_name='%s:copy_sequence' % job_name)
             else:
                 print('Creating Symbolic Link single file %s' % source)
-            command = 'mklink'
-            temp_dict = {'command': command}
+                command = 'mklink /H %s %s' % (destination, source)
+                temp_dict = cgl_execute(command=command, print_output=False, methodology='local', verbose=verbose,
+                                        command_name='%s:copy_sequence' % job_name)
         else:
             temp_dict = cgl_copy_single(source, destination, test=False, verbose=False, dest_is_folder=dest_is_folder)
     run_dict['command'] = temp_dict['command']
@@ -342,6 +345,17 @@ def cgl_execute(command, return_output=False, print_output=True, methodology='lo
                 'farm_processing_end': '',
                 'farm_processing_time': '',
                 'job_id': None}
+    if 'mklink' in command:
+        print command
+        parts = command.split()
+        print parts
+        dir_, file_ = os.path.split(parts[2])
+        file_ = file_.replace('\\', '')
+        print 'Creating Symbolic link'
+        print '1: Create directory %s' % dir_
+        print '2: create symlink %s' % file_
+        print '3: final command\n%s' % command.replace(parts[2], file_)
+        return
     if methodology == 'local':
         output_values = []
         import subprocess
