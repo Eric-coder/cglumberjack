@@ -169,6 +169,7 @@
                 "server_url": ""
             }, 
             "tasks": {
+                "symlink": ["comp", "tex", "light"],
                 "ANIMATION": {
                     "long_to_short": {
                         "assets": {
@@ -518,6 +519,7 @@
                 "default_schema": "default"
             }, 
             "tasks": {
+                "symlink": ["comp", "tex", "lite"],
                 "default": {
                     "long_to_short": {
                         "shots": {

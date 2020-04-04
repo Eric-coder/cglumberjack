@@ -116,17 +116,30 @@ def test_string_against_rules(test_string, rule, effected_label=None):
         return CONFIG['paths']['rules']['%s_example' % rule]
 
 
-def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_folder=False, test=False, job_name=''):
+def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_folder=False, job_name='',
+             symlink=False):
     """
     Catch all for any type of copy function.  Handles a list of files/folders as well as individual files.
     :param source: takes a list of files/folders, or a string represeting a file or folder
     :param destination: string, directory or filename
-    :param test: if True no the function only prints what it would be copying
+    :param methodology: local, smedge, deadline
     :param verbose:
     :param dest_is_folder: If True the copy tool will assume that the destination string represents a folder
+    :param job_name: Name of the Job
+    :param symlink: IF true do a symlink rather than a copy.
     :return:
     """
-    from cgl.core.path import get_file_type
+    from cgl.core.path import get_file_type, PathObject
+    proj_man = CONFIG['account_info']['project_management']
+    symlink_list = CONFIG['project_management'][proj_man]['tasks']['symlink']
+    symlink = False
+    if symlink_list:
+        print symlink_list, 3
+        path_object = PathObject(source)
+        task = path_object.task
+        print task, 2
+        if task in symlink_list:
+            symlink = True
 
     run_dict = {'start_time': time.time(),
                 'function': 'cgl_copy()'}
@@ -135,23 +148,41 @@ def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_fo
         run_dict['output'] = os.path.join(destination, file_)
         pattern = '%s*' % file_.split('###')[0]
         source = glob.glob(source)
-        command = 'robocopy "%s" "%s" "%s" /NFL /NDL /NJH /NJS /nc /ns /np /MT:8' % (dir_, destination, pattern)
-        temp_dict = cgl_execute(command=command, print_output=False, methodology=methodology, verbose=verbose,
-                                command_name='%s:copy_sequence' % job_name)
-        # return the sequence based off the folder
-        run_dict['output'] = os.path.join(destination, file_)
-        run_dict['job_id'] = temp_dict['job_id']
+        if symlink:
+            print('Creating Symbolic Link Sequence')
+            command = 'mklink'
+            temp_dict = {'command': command}
+        else:
+            command = 'robocopy "%s" "%s" "%s" /NFL /NDL /NJH /NJS /nc /ns /np /MT:8' % (dir_, destination, pattern)
+            temp_dict = cgl_execute(command=command, print_output=False, methodology=methodology, verbose=verbose,
+                                    command_name='%s:copy_sequence' % job_name)
+            # return the sequence based off the folder
+            run_dict['output'] = os.path.join(destination, file_)
+            run_dict['job_id'] = temp_dict['job_id']
     if isinstance(source, list):
-        temp_dict = copy_file_list(source, destination, methodology, verbose, dest_is_folder)
+        if symlink:
+            print('Creating Symbolic Link list')
+            command = 'mklink'
+            temp_dict = {'command': command}
+        else:
+            temp_dict = copy_file_list(source, destination, methodology, verbose, dest_is_folder, symlink=symlink)
     else:
-        temp_dict = cgl_copy_single(source, destination, test=False, verbose=False, dest_is_folder=dest_is_folder)
+        if symlink_list:
+            if os.path.isdir(source):
+                print('Creating Symbolic Link single directory %s' % source)
+            else:
+                print('Creating Symbolic Link single file %s' % source)
+            command = 'mklink'
+            temp_dict = {'command': command}
+        else:
+            temp_dict = cgl_copy_single(source, destination, test=False, verbose=False, dest_is_folder=dest_is_folder)
     run_dict['command'] = temp_dict['command']
     run_dict['artist_time'] = get_end_time(run_dict['start_time'])
     run_dict['end_time'] = time.time()
     return run_dict
 
 
-def copy_file_list(file_list, destination, methodology, verbose, dest_is_folder=True):
+def copy_file_list(file_list, destination, methodology, verbose, dest_is_folder=True, symlink=False):
     """
     this function takes a list of files and figures out the most efficient way to copy them in the following order:
     1) Are there any folders in this list?
