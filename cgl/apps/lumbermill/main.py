@@ -720,6 +720,10 @@ class CGLumberjack(LJMainWindow):
         st_utils.setup_workstation()
 
     def load_pipeline_designer_menus(self):
+        """
+        Loads all pipeline designer menus
+        :return:
+        """
         import json
         #
         menus_json = os.path.join(CONFIG['paths']['cgl_tools'], 'lumbermill', 'menus.cgl')
@@ -753,6 +757,12 @@ class CGLumberjack(LJMainWindow):
         return menu_object
 
     def add_menu_buttons(self, menu, buttons):
+        """
+        add menu buttons from pipeline designer menus
+        :param menu:
+        :param buttons:
+        :return:
+        """
         for button in buttons:
             label = self.pd_menus[menu][button]['label']
             if 'icon' in self.pd_menus[menu][button].keys():

@@ -140,6 +140,7 @@ def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_fo
         print task, 2
         if task in symlink_list:
             symlink = True
+    print 'symlink, %s' % symlink
 
     run_dict = {'start_time': time.time(),
                 'function': 'cgl_copy()'}
@@ -153,6 +154,7 @@ def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_fo
             command = 'mklink /D "%s" "%s"' % (destination.replace('/', '\\'), dir_.replace('/', '\\'))
             temp_dict = cgl_execute(command=command, print_output=False, methodology='local', verbose=verbose,
                                     command_name='%s:copy_sequence' % job_name)
+            temp_dict['command'] = command
         else:
             command = 'robocopy "%s" "%s" "%s" /NFL /NDL /NJH /NJS /nc /ns /np /MT:8' % (dir_, destination, pattern)
             temp_dict = cgl_execute(command=command, print_output=False, methodology=methodology, verbose=verbose,
@@ -166,7 +168,7 @@ def cgl_copy(source, destination, methodology='local', verbose=False, dest_is_fo
         else:
             temp_dict = copy_file_list(source, destination, methodology, verbose, dest_is_folder, symlink=symlink)
     else:
-        if symlink_list:
+        if symlink:
             if os.path.isdir(source):
                 print('Creating Symbolic Link single directory %s' % source)
                 command = 'mklink /D %s %s' % (destination.replace('/', '\\'), source.replace('/', '\\'))
@@ -353,9 +355,13 @@ def cgl_execute(command, return_output=False, print_output=True, methodology='lo
         file_ = file_.replace('\\', '')
         print 'Creating Symbolic link'
         print '1: Create directory %s' % dir_
-        print '2: create symlink %s' % file_
+        print '2: CD to directory %s' % dir_
         print '3: final command\n%s' % command.replace(parts[2], file_)
-        return
+        run_dict['artist_time'] = time.time() - run_dict['start_time']
+        run_dict['end_time'] = time.time()
+        run_dict['printout'] = ''
+        run_dict['command'] = command.replace(parts[2], file_)
+        return run_dict
     if methodology == 'local':
         output_values = []
         import subprocess
