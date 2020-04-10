@@ -90,7 +90,7 @@ def get_meta_data2(filein, tool='exiftool'):
         command = r'exiftool %s' % filein
         output = cgl_execute(command=command, verbose=False)
         for each in output['printout']:
-            key, value = re.split("\s+:\s+", each)
+            key, value = re.split("\s*:\s+", each)
             d[key] = value
         return d
     elif tool == 'ffprobe':
