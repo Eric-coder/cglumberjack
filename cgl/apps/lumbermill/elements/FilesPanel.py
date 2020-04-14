@@ -341,13 +341,7 @@ class FilesPanel(QtWidgets.QWidget):
     def on_render_double_clicked(self, data):
         if data:
             self.in_current_folder = False
-            # print self.path_object.path_root
-            # print self.path_object.render_pass
-            # print self.path_object.camera
-            # print self.path_object.aov
-            # print '----------------------------'
             selected = data[0][0]
-            print selected
             if selected == '.':
                 print 'going back a folder'
                 last = self.path_object.get_last_attr()
@@ -373,7 +367,6 @@ class FilesPanel(QtWidgets.QWidget):
         else:
             position = len(pieces)
         selected_variable = path_object.template[position]
-        print 'selected variable:', selected_variable
         return selected_variable
 
     def on_render_selected(self, data):
@@ -390,7 +383,6 @@ class FilesPanel(QtWidgets.QWidget):
                 self.in_current_folder = True
             else:
                 current_variable = self.get_next_path_object_variable(object_, current=True)
-            print current_variable, object_.path_root
             if current_variable != 'filename':
                 if object_.filename:
                     object_.set_attr(filename='')
@@ -401,7 +393,6 @@ class FilesPanel(QtWidgets.QWidget):
             # object_.set_attr(task=self.sender().task)
             if current_variable == 'filename':
                 if os.path.splitext(data[0][0]):
-                    print 'this is a file'
                     object_.set_attr(filename=data[0][0])
                     filename_base, ext = os.path.splitext(data[0][0])
                     object_.set_attr(filename_base=filename_base)
@@ -518,7 +509,6 @@ class FilesPanel(QtWidgets.QWidget):
         files_widget.on_task_selected(self.path_object)
 
     def on_assign_button_clicked(self, data):
-        print data
         task = self.sender().task
         users_dict = CONFIG['project_management'][self.project_management]['users']
         all_users = []
@@ -534,7 +524,6 @@ class FilesPanel(QtWidgets.QWidget):
         dialog.exec_()
         if dialog.button == 'Start':
             selected_user = dialog.combo_box.currentText()  # this denotes the OS login name of the user
-            print selected_user
             user_info = CONFIG['project_management'][self.project_management]['users'][selected_user]
             self.path_object.set_attr(task=task)
             self.path_object.set_attr(user=selected_user)
@@ -562,9 +551,25 @@ class FilesPanel(QtWidgets.QWidget):
         clipboard = QtWidgets.QApplication.clipboard()
         clipboard.setText(self.path_object.path_root)
 
-    @staticmethod
-    def import_versions_from():
-        print 'import versions'
+    def import_versions_from(self):
+        """
+        Grabs latest publish version of "source"
+        :return:
+        """
+        if self.path_object.filename:
+            current_dir = str(os.path.dirname(self.path_object.path_root))
+        else:
+            current_dir = str(self.path_object.path_root)
+        print 'current dir: %s' % current_dir
+        path_object = PathObject(self.path_object)
+        path_object = path_object.latest_version(publish_=True)
+        for each in path_object.glob_project_element('filename'):
+            full_name = os.path.join(os.path.dirname(path_object.path_root), each)
+            print 'copying %s to %s' % (full_name, os.path.join(current_dir, each))
+            cgl_copy(full_name, os.path.join(current_dir, each), methodology='local')
+            dialog_ = InputDialog(title='Success!', message='You have successfully pulled <b>publish version %s</b> '
+                                                            'to your current version!' % path_object.version)
+            dialog_.exec_()
 
     @staticmethod
     def push():

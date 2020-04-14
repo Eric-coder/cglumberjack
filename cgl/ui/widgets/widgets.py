@@ -750,7 +750,7 @@ class FileTableWidget(LJTableWidget):
         self.item_right_click_menu.create_action("Copy Folder Path", self.copy_folder_path)
         self.item_right_click_menu.create_action("Copy File Path", self.copy_file_path)
         self.item_right_click_menu.addSeparator()
-        self.item_right_click_menu.create_action("Import Version From...", self.import_version_from)
+        self.item_right_click_menu.create_action("Get Latest Publish", self.import_version_from)
         self.item_right_click_menu.addSeparator()
         # self.add_custom_task_items()
         self.item_right_click_menu.addSeparator()
